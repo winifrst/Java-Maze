@@ -63,7 +63,12 @@ public final class EllerGenerator implements MazeGenerator {
             // Шаг 3: убрать некоторые нижние стены. Для последней строки
             // нижние стены остаются на месте (это внешняя граница).
             if (r < rows - 1) {
-                carveBottomWalls(maze, setId, r, cols, nextSetId);
+                // Вычисляем реальный максимум множеств после объединений.
+                int maxSetId = 0;
+                for (int id : setId) {
+                    if (id > maxSetId) maxSetId = id;
+                }
+                carveBottomWalls(maze, setId, r, cols, maxSetId);
                 // Шаг 4: скопировать множества вниз, сбросить остальные.
                 for (int c = 0; c < cols; c++) {
                     if (maze.getCell(r, c).hasWallBottom()) {
@@ -75,17 +80,18 @@ public final class EllerGenerator implements MazeGenerator {
         return maze;
     }
 
-    /**
-     * Убирает нижние стены так, чтобы у каждого множества в строке
-     * осталась хотя бы одна клетка с нижней стеной. Это гарантирует,
-     * что каждая компонента связности «прорастёт» в следующую строку.
-     */
-    private void carveBottomWalls(Maze maze, int[] setId, int row, int cols, int maxSetId) {
-        // Собираем позиции клеток по множествам.
+    private void carveBottomWalls(
+            Maze maze,
+            int[] setId,
+            int row,
+            int cols,
+            int maxSetId
+    ) {
         List<List<Integer>> cellsBySet = new ArrayList<>();
         for (int i = 0; i <= maxSetId; i++) {
             cellsBySet.add(new ArrayList<>());
         }
+
         for (int c = 0; c < cols; c++) {
             cellsBySet.get(setId[c]).add(c);
         }
@@ -94,14 +100,14 @@ public final class EllerGenerator implements MazeGenerator {
             if (group.isEmpty()) {
                 continue;
             }
-            // Оставляем хотя бы одну клетку с нижней стеной.
-            int keepIndex = random.nextInt(group.size());
-            for (int i = 0; i < group.size(); i++) {
-                if (i == keepIndex) {
-                    continue;
-                }
-                if (random.nextBoolean()) {
-                    int c = group.get(i);
+
+            // Обязательный проход вниз для данного множества.
+            int requiredPassage = group.get(random.nextInt(group.size()));
+            maze.getCell(row, requiredPassage).setWallBottom(false);
+
+            // Дополнительные случайные проходы вниз.
+            for (int c : group) {
+                if (c != requiredPassage && random.nextBoolean()) {
                     maze.getCell(row, c).setWallBottom(false);
                 }
             }
