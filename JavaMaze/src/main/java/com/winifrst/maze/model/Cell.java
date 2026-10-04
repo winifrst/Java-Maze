@@ -1,27 +1,22 @@
 package com.winifrst.maze.model;
 
 public final class Cell {
-    private boolean hasWallRight = true;
-    private boolean hasWallBottom = true;
-
-//    public Cell() {
-//        this.hasWallRight = true;
-//        this.hasWallBottom = true;
-//    }
+    private boolean wallRight = true;
+    private boolean wallBottom = true;
 
     public boolean hasWallRight() {
-        return hasWallRight;
+        return wallRight;
     }
 
     public boolean hasWallBottom() {
-        return hasWallBottom;
+        return wallBottom;
     }
 
-    public void setWallRight(boolean wall) {
-        this.hasWallRight = wall;
+    public void setWallRight(boolean wallRight) {
+        this.wallRight = wallRight;
     }
 
-    public void setWallBottom(boolean wall) {
-        this.hasWallBottom = wall;
+    public void setWallBottom(boolean wallBottom) {
+        this.wallBottom = wallBottom;
     }
 }

@@ -1,9 +1,7 @@
 package com.winifrst.maze;
 
-import com.winifrst.maze.model.Maze;
-import com.winifrst.maze.model.Point;
 import com.winifrst.maze.render.ConsoleRenderer;
-import java.util.List;
+
 import java.util.Scanner;
 
 /**
@@ -12,7 +10,6 @@ import java.util.Scanner;
 public final class Main {
 
     private Main() {
-        // utility class
     }
 
     public static void main(String[] args) {
@@ -52,17 +49,12 @@ public final class Main {
             }
 
             try {
-                Maze maze = service.generate(rows, cols);
-                System.out.println(renderer.render(maze));
+                MazeService.MazeWithSolution result = service.generateWithSolution(rows, cols);
+                System.out.println(renderer.render(result.maze()));
 
-                // Показать решение (от верх-лево до низ-право)
-                Point start = new Point(0, 0);
-                Point end = new Point(rows - 1, cols - 1);
-                List<Point> solution = service.solve(maze, start, end);
-
-                if (solution != null && !solution.isEmpty()) {
-                    System.out.println("Решение (" + solution.size() + " шагов):");
-                    System.out.println(renderer.render(maze, solution));
+                if (!result.solution().isEmpty()) {
+                    System.out.println("Решение (" + result.solution().size() + " шагов):");
+                    System.out.println(renderer.render(result.maze(), result.solution()));
                 } else {
                     System.out.println("Решение не найдено.");
                 }
