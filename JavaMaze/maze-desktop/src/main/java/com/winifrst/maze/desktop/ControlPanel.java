@@ -16,6 +16,8 @@ public final class ControlPanel extends JPanel {
     private final JTextField rowsField = new JTextField("10", 4);
     private final JTextField colsField = new JTextField("10", 4);
     private final JButton generateButton = new JButton("Generate");
+    private final JButton solveButton = new JButton("Solve");
+    private final JLabel statusLabel = new JLabel("");
 
     public ControlPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -25,6 +27,8 @@ public final class ControlPanel extends JPanel {
         add(new JLabel("Cols:"));
         add(colsField);
         add(generateButton);
+        add(solveButton);
+        add(statusLabel);
     }
 
     public JTextField getRowsField() {
@@ -37,5 +41,13 @@ public final class ControlPanel extends JPanel {
 
     public JButton getGenerateButton() {
         return generateButton;
+    }
+
+    public JButton getSolveButton() {
+        return solveButton;
+    }
+
+    public JLabel getStatusLabel() {
+        return statusLabel;
     }
 }
