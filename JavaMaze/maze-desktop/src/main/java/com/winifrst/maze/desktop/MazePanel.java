@@ -59,6 +59,10 @@ public final class MazePanel extends JPanel {
         repaint();
     }
 
+    public List<Point> getSolutionPath() {
+        return solutionPath;
+    }
+
     public void setCellClickHandler(Consumer<Point> handler) {
         this.cellClickHandler = handler;
     }

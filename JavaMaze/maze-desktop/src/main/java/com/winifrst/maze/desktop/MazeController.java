@@ -4,7 +4,9 @@ import com.winifrst.maze.MazeService;
 import com.winifrst.maze.model.Maze;
 import com.winifrst.maze.model.Point;
 
+import java.nio.file.Path;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -26,18 +28,60 @@ public final class MazeController {
 
     private void wireListeners() {
         controlPanel.getGenerateButton().addActionListener(e -> onGenerate());
+        controlPanel.getLoadButton().addActionListener(e -> onLoad());
+        controlPanel.getSaveButton().addActionListener(e -> onSave());
         controlPanel.getSolveButton().addActionListener(e -> onSolve());
         mazePanel.setCellClickHandler(this::onCellClick);
     }
 
+    private void onLoad() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Загрузить лабиринт");
+        int result = fileChooser.showOpenDialog(mazePanel);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                Path path = fileChooser.getSelectedFile().toPath();
+                Maze maze = service.load(path);
+                mazePanel.setMaze(maze);
+                mazePanel.setStartCell(null);
+                mazePanel.setEndCell(null);
+                mazePanel.setSolutionPath(null);
+                updateStatusLabel();
+            } catch (Exception e) {
+                showError("Не удалось загрузить: " + e.getMessage());
+            }
+        }
+    }
+
+    private void onSave() {
+        Maze maze = mazePanel.getMaze();
+        if (maze == null) {
+            showError("Сначала сгенерируйте или загрузите лабиринт.");
+            return;
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Сохранить лабиринт");
+        fileChooser.setSelectedFile(new java.io.File("maze.txt"));
+        int result = fileChooser.showSaveDialog(mazePanel);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                Path path = fileChooser.getSelectedFile().toPath();
+                service.save(maze, path);
+            } catch (Exception e) {
+                showError("Не удалось сохранить: " + e.getMessage());
+            }
+        }
+    }
+
     private void onGenerate() {
         try {
-            int rows = parseDimension(controlPanel.getRowsField().getText(), "rows");
-            int cols = parseDimension(controlPanel.getColsField().getText(), "cols");
+            int rows = parseDimension(controlPanel.getXField().getText(), "x");
+            int cols = parseDimension(controlPanel.getYField().getText(), "y");
             Maze maze = service.generate(rows, cols);
             mazePanel.setMaze(maze);
             mazePanel.setStartCell(null);
             mazePanel.setEndCell(null);
+            mazePanel.setSolutionPath(null);
             updateStatusLabel();
         } catch (NumberFormatException e) {
             showError("Размер должен быть целым числом.");
@@ -74,6 +118,11 @@ public final class MazeController {
     }
 
     private void onCellClick(Point cell) {
+        // Если путь уже нарисован — сбросить его при любом клике
+        if (mazePanel.getSolutionPath() != null && !mazePanel.getSolutionPath().isEmpty()) {
+            mazePanel.setSolutionPath(null);
+        }
+
         Point currentStart = mazePanel.getStartCell();
         Point currentEnd = mazePanel.getEndCell();
 
