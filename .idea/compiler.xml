@@ -6,7 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="JavaMaze" />
+        <module name="maze-desktop" />
+        <module name="maze-core" />
       </profile>
     </annotationProcessing>
   </component>

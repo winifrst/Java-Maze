@@ -70,7 +70,6 @@ public final class MazePanel extends JPanel {
     public MazePanel() {
         setPreferredSize(new Dimension(FIELD_SIZE, FIELD_SIZE));
         setBackground(Color.WHITE);
-        this.maze = createTestMaze();
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -161,15 +160,5 @@ public final class MazePanel extends JPanel {
         g2.setColor(color);
         g2.setStroke(new BasicStroke(3));
         g2.drawRoundRect((int) x + 2, (int) y + 2, (int) cellW - 4, (int) cellH - 4, 6, 6);
-    }
-
-    private Maze createTestMaze() {
-        Maze m = new Maze(3, 3);
-        m.getCell(0, 0).setWallRight(false);
-        m.getCell(0, 1).setWallBottom(false);
-        m.getCell(1, 1).setWallRight(false);
-        m.getCell(1, 2).setWallBottom(false);
-        m.getCell(2, 0).setWallBottom(false);
-        return m;
     }
 }

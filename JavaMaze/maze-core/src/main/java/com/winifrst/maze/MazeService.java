@@ -12,6 +12,8 @@ import com.winifrst.maze.solver.MazeSolver;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.winifrst.maze.model.Maze.MAX_SIZE;
+
 /**
  * Фасад над генератором, решателем и I/O.
  * <p>
@@ -40,7 +42,7 @@ public final class MazeService {
     private final MazeWriter writer;
 
     /**
-     * Пол��ый конструктор — для DI и тестов.
+     * Полный конструктор — для DI и тестов.
      */
     public MazeService(MazeGenerator generator, MazeSolver solver,
                        MazeReader reader, MazeWriter writer) {
@@ -67,9 +69,9 @@ public final class MazeService {
             throw new IllegalArgumentException(
                     "Размеры должны быть >= 1, но получили: " + rows + "x" + cols);
         }
-        if (rows > 50 || cols > 50) {
+        if (rows > MAX_SIZE || cols > MAX_SIZE) {
             throw new IllegalArgumentException(
-                    "Размеры должны быть <= 50, но получили: " + rows + "x" + cols);
+                    "Размеры должны быть <= " + MAX_SIZE + ", но получили: " + rows + "x" + cols);
         }
     }
 

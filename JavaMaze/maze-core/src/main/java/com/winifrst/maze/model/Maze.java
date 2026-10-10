@@ -1,11 +1,10 @@
 package com.winifrst.maze.model;
 
-import static com.winifrst.maze.Constants.MAX_SIZE;
-
 public final class Maze {
     private final int rows;
     private final int cols;
     private final Cell[][] cells;
+    public static final int MAX_SIZE = 50;
 
     public Maze(int rows, int cols) {
         if (rows < 1 || rows > MAX_SIZE || cols < 1 || cols > MAX_SIZE) {
