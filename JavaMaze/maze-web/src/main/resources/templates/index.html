@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Maze</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .controls { margin-bottom: 15px; }
+        .controls label { margin-right: 5px; }
+        .maze { display: inline-block; border: 1px solid #ccc; }
+        .maze svg { display: block; }
+        .status { margin-top: 10px; color: #555; }
+    </style>
+</head>
+<body>
+<h1>Maze</h1>
+
+<form class="controls" th:action="@{/generate}" method="post">
+    <label>Rows: <input type="number" name="rows" min="1" max="50" th:value="${rows}"/></label>
+    <label>Cols: <input type="number" name="cols" min="1" max="50" th:value="${cols}"/></label>
+    <button type="submit">Generate</button>
+</form>
+
+<form class="controls" th:action="@{/solve}" method="post" th:if="${maze != null}">
+    <button type="submit">Solve</button>
+</form>
+
+<div class="maze" th:if="${svg != null}" th:utext="${svg}"></div>
+
+<div class="status" th:text="${status}">Статус</div>
+</body>
+</html>
