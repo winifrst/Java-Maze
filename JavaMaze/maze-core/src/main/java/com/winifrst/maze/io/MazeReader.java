@@ -9,16 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.StringTokenizer;
 
-/**
- * Читает лабиринт из файла в формате задания:
- * <pre>
- * rows cols
- * v[0][0] v[0][1] ... v[0][cols-1]   // 1 = стена справа
- * ...
- * h[0][0] h[0][1] ... h[0][cols-1]   // 1 = стена снизу
- * ...
- * </pre>
- */
 public final class MazeReader {
 
     public Maze read(Path path) {

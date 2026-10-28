@@ -14,26 +14,6 @@ import java.util.*;
 
 import static com.winifrst.maze.model.Maze.MAX_SIZE;
 
-/**
- * Фасад над генератором, решателем и I/O.
- * <p>
- * Точка входа для всех операций с лабиринтом: генерация, решение, сохранение, загрузка.
- * Не знает ни о Swing, ни о Spring, ни о консоли — чистая бизнес-логика.
- * <p>
- * Для Spring-обёртки достаточно внедрить зависимости через конструктор:
- * <pre>{@code
- * @Service
- * class MyMazeService {
- *     private final MazeService mazeService;
- *     MyMazeService(MazeService mazeService) { this.mazeService = mazeService; }
- * }
- * }</pre>
- * <p>
- * Для тестов — использовать конструктор с моками:
- * <pre>{@code
- * MazeService service = new MazeService(mockGenerator, mockSolver, mockReader, mockWriter);
- * }</pre>
- */
 public final class MazeService {
 
     private final MazeGenerator generator;
@@ -41,9 +21,6 @@ public final class MazeService {
     private final MazeReader reader;
     private final MazeWriter writer;
 
-    /**
-     * Полный конструктор — для DI и тестов.
-     */
     public MazeService(MazeGenerator generator, MazeSolver solver,
                        MazeReader reader, MazeWriter writer) {
         this.generator = Objects.requireNonNull(generator, "generator");
@@ -52,17 +29,13 @@ public final class MazeService {
         this.writer = Objects.requireNonNull(writer, "writer");
     }
 
-    /** Конструктор по умолчанию: Эллер + BFS + стандартный I/O. */
     public MazeService() {
         this(new EllerGenerator(), new BfsSolver(), new MazeReader(), new MazeWriter());
     }
 
-    /** Для тестов и воспроизводимости. */
     public MazeService(Random random) {
         this(new EllerGenerator(random), new BfsSolver(), new MazeReader(), new MazeWriter());
     }
-
-    // ===================== Генерация =====================
 
     private static void validateDimensions(int rows, int cols) {
         if (rows < 1 || cols < 1) {
@@ -75,26 +48,11 @@ public final class MazeService {
         }
     }
 
-    /**
-     * Генерирует идеальный лабиринт заданного размера.
-     *
-     * @param rows количество строк (должно быть >= 1)
-     * @param cols количество столбцов (должно быть >= 1)
-     * @return готовый лабиринт
-     * @throws IllegalArgumentException если размеры некорректны
-     */
     public Maze generate(int rows, int cols) {
         validateDimensions(rows, cols);
         return generator.generate(rows, cols);
     }
 
-    // ===================== Решение =====================
-
-    /**
-     * Генерирует лабиринт и сразу находит решение.
-     *
-     * @return пара (лабиринт, путь решения); путь может быть пустым, если решения нет
-     */
     public MazeWithSolution generateWithSolution(int rows, int cols) {
         Maze maze = generate(rows, cols);
         Point start = new Point(0, 0);
@@ -103,13 +61,6 @@ public final class MazeService {
         return new MazeWithSolution(maze, solution != null ? solution : Collections.emptyList());
     }
 
-    // ===================== I/O =====================
-
-    /**
-     * Находит путь от start до end в лабиринте (BFS).
-     *
-     * @return список точек пути от начала до конца; пустой список, если решения нет
-     */
     public List<Point> solve(Maze maze, Point start, Point end) {
         Objects.requireNonNull(maze, "maze");
         Objects.requireNonNull(start, "start");
@@ -118,34 +69,17 @@ public final class MazeService {
         return solution != null ? solution : Collections.emptyList();
     }
 
-    /**
-     * Загружает лабиринт из файла.
-     */
     public Maze load(Path path) {
         Objects.requireNonNull(path, "path");
         return reader.read(path);
     }
 
-    // ===================== Валидация =====================
-
-    /**
-     * Сохраняет лабиринт в файл.
-     */
     public void save(Maze maze, Path path) {
         Objects.requireNonNull(maze, "maze");
         Objects.requireNonNull(path, "path");
         writer.write(maze, path);
     }
 
-    /**
-     * Проверяет, что лабиринт идеален (perfect):
-     * <ul>
-     *   <li>Все клетки связаны (BFS от (0,0) посещает все клетки)</li>
-     *   <li>Нет циклов</li>
-     * </ul>
-     * <p>
-     * Для больших лабиринтов проверка может занять время.
-     */
     public boolean isPerfect(Maze maze) {
         Objects.requireNonNull(maze, "maze");
         if (maze.getRows() == 0 || maze.getCols() == 0) {
@@ -156,11 +90,6 @@ public final class MazeService {
         return visited.size() == totalCells;
     }
 
-    // ===================== Геттеры для DI =====================
-
-    /**
-     * Проверяет, что стартовая и конечная точки корректны для данного лабиринта.
-     */
     public boolean isValidPoints(Maze maze, Point start, Point end) {
         Objects.requireNonNull(maze, "maze");
         Objects.requireNonNull(start, "start");
@@ -169,25 +98,14 @@ public final class MazeService {
                 && maze.inBounds(end.row(), end.col());
     }
 
-    /**
-     * Возвращает генератор — для Spring-биндинга и тестов.
-     */
     public MazeGenerator getGenerator() {
         return generator;
     }
 
-    // ===================== Внутренние методы =====================
-
-    /**
-     * Возвращает солвер — для Spring-биндинга и тестов.
-     */
     public MazeSolver getSolver() {
         return solver;
     }
 
-    /**
-     * BFS, который собирает все достижимые клетки от start.
-     */
     private List<Point> bfsVisitAll(Maze maze, Point start) {
         boolean[][] visited = new boolean[maze.getRows()][maze.getCols()];
         Queue<Point> queue = new ArrayDeque<>();
@@ -200,7 +118,6 @@ public final class MazeService {
             Point current = queue.poll();
             result.add(current);
 
-            // Соседи: up, down, left, right
             int[][] deltas = {
                     {-1, 0}, {1, 0}, {0, -1}, {0, 1}
             };
@@ -213,7 +130,6 @@ public final class MazeService {
                     continue;
                 }
 
-                // Проверяем, нет стены между current и (nr, nc)
                 boolean blocked = false;
                 if (d[0] == 1) { // вниз
                     blocked = maze.getCell(current.row(), current.col()).hasWallBottom();
@@ -235,11 +151,6 @@ public final class MazeService {
         return result;
     }
 
-    // ===================== DTO =====================
-
-    /**
-     * Нерезультат: лабиринт + найденный путь.
-     */
     public record MazeWithSolution(Maze maze, List<Point> solution) {
         public MazeWithSolution {
             Objects.requireNonNull(maze, "maze");

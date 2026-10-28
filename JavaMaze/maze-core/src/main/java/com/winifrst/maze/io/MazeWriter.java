@@ -8,9 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Пишет лабиринт в файл в формате задания.
- */
 public final class MazeWriter {
 
     public void write(Maze maze, Path path) {

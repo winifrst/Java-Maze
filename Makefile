@@ -10,6 +10,8 @@ build:
 test:
 	$(MVN) test
 
+# 	mvn -pl maze-core test
+
 package:
 	$(MVN) -q package
 
